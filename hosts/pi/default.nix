@@ -3,7 +3,9 @@
   pkgs,
   lib,
   ...
-}: let
+}:
+# Define variables
+let
   user = "user";
   hashedPassword = "$y$j9T$S6GQmMWVSaLC9akC6aPcd1$3HV1XwIjUAR18ZwEriXXw3MRu/PUHld7lAFRsY1R.KA";
   SSID = "example";
@@ -11,9 +13,14 @@
   interface = "wlan0";
   hostname = "example";
 in {
+  
+  # Disable default imports
   imports = [];
+
+  # Nixpkgs configuration
   nixpkgs = {
     overlays = [
+      # Enable experimental features in Waybar
       (self: super: {
         waybar = super.waybar.overrideAttrs (oldAttrs: {
           mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
@@ -21,22 +28,33 @@ in {
       })
     ];
   };
-   nix = {
+
+  # Nix configuration
+  nix = {
     package = pkgs.nix;
     settings.experimental-features = [ "nix-command" "flakes" ];
   };
+  # Boot configuration
   boot = {
+    # Use Linux kernel packages for Raspberry Pi 4
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi4;
+
+    # Specify available kernel modules
     initrd.availableKernelModules = ["xhci_pci" "usbhid" "usb_storage"];
+
+    # Use generic-extlinux-compatible loader instead of GRUB
     loader = {
       grub.enable = false;
       generic-extlinux-compatible.enable = true;
     };
+
+    # Set sysctl parameters
     kernel.sysctl = {
       "net.ipv4.ip_unprivileged_port_start" = 0;
     };
   };
 
+  # File system configuration
   fileSystems = {
     "/" = {
       device = "/dev/disk/by-label/NIXOS_SD";
@@ -45,23 +63,35 @@ in {
     };
   };
 
+  # Networking configuration
   networking = {
+    # Enable nftables
     nftables.enable = true;
+
+    # Firewall settings
     firewall = {
       enable = true;
       allowedTCPPorts = [22 53 80 443];
       allowedUDPPorts = [53];
     };
+
+    # Set hostname and extra hosts
     hostName = hostname;
     extraHosts = ''
       192.168.10.3 ${hostname}.local
     '';
+
+    # Wireless network settings
     wireless = {
       enable = true;
       networks."${SSID}".psk = SSIDpassword;
       interfaces = [interface];
     };
+
+    # Disable dhcpcd
     dhcpcd.enable = false;
+
+    # Interface configuration
     interfaces = {
       end0.useDHCP = false;
       end0.ipv4.addresses = [
@@ -71,12 +101,16 @@ in {
         }
       ];
     };
+
+    # Default gateway and nameservers
     defaultGateway = "192.168.10.1";
     nameservers = ["1.1.1.3" "1.0.0.3"];
   };
-
+  
+  # Set available shells
   environment.shells = with pkgs; [zsh];
 
+  # Install additional system packages
   environment.systemPackages = with pkgs; [
     btop
     dconf
@@ -112,6 +146,7 @@ in {
     NIXOS_OZONE_WL = "1";
   };
 
+  # Docker configuration
   virtualisation.docker.enable = true;
 
   virtualisation.docker.rootless = {
@@ -119,15 +154,20 @@ in {
     setSocketVariable = true;
   };
 
+  # Services configuration
   services = {
+    # Enable OpenSSH server
     openssh.enable = true;
+    # Enable SDDM display manager for Wayland
     xserver.displayManager.sddm.wayland.enable = true;
   };
 
+  # Polkit configuration
   security = {
     polkit.enable = true;
   };
 
+  # User configuration
   users = {
     defaultUserShell = pkgs.zsh;
     mutableUsers = false;
@@ -139,27 +179,45 @@ in {
     };
   };
 
+  # Sound configuration (commented out)
   # sound.enable = true;
 
+  # Hardware configuration
   hardware = {
+    # Enable device tree overlays for Raspberry Pi 4
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
+    # Enable device tree
     deviceTree = {
       enable = true;
       filter = "*rpi-4-*.dtb";
     };
+
+    # Enable FKMS 3D driver (commented out)
     # raspberry-pi."4".fkms-3d.enable = true;
+
+    # Enable PulseAudio and audio support (commented out)
     # pulseaudio.enable = true;
     # raspberry-pi."4".audio.enable = true;
+
+    # Enable redistributable firmware
     enableRedistributableFirmware = true;
   };
 
+  # Programs configuration
   programs = {
+    # Enable dconf
     dconf.enable = true;
+
+    # Enable Hyprland and XWayland
     hyprland = {
       enable = true;
       xwayland.enable = true;
     };
+
+    # Enable Zsh
     zsh.enable = true;
   };
+
+  # NixOS state version
   system.stateVersion = "23.11";
 }
