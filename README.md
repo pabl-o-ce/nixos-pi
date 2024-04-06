@@ -1,0 +1,1 @@
+# NixOS raspberry pi configuration
