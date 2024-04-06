@@ -1,1 +1,7 @@
-# NixOS raspberry pi configuration
+# NixOS configuration RPi4
+
+## Install
+
+## Config
+
+## Deployment
