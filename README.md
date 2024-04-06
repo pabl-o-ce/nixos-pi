@@ -13,13 +13,26 @@ A NixOS configuration for the Raspberry Pi 4, featuring a custom setup for wirel
 ```sh
     cd nixos-pi
 ```
-4. Build and activate the NixOS configuration using flakes:
-```sh
-    sudo nixos-rebuild switch --flake .#pi
-```
 
 Note: Make sure you have write permissions for the microSD card and that you specify the correct device path to avoid data loss.
 
 ## Config
 
+1. Add variables in the `hosts/pi/default.nix`:
+```nix
+# Define variables
+let
+  user = "user";
+  hashedPassword = "$y$j9T$S6GQmMWVSaLC9akC6aPcd1$3HV1XwIjUAR18ZwEriXXw3MRu/PUHld7lAFRsY1R.KA";
+  SSID = "example";
+  SSIDpassword = "example";
+  interface = "wlan0";
+  hostname = "example";
+```
+
 ## Deployment
+
+1. Build and activate the NixOS configuration using flakes:
+```sh
+    sudo nixos-rebuild switch --flake .#pi
+```
