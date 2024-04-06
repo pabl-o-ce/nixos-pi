@@ -28,6 +28,10 @@ let
   SSIDpassword = "example";
   interface = "wlan0";
   hostname = "example";
+  ip = "10.0.0.4"
+  ipGateway = "10.0.0.1"
+  dns1 = "1.1.1.3"
+  dns2 = "1.0.0.3"
 ```
 
 ## Deployment
