@@ -12,6 +12,11 @@ let
   SSIDpassword = "example";
   interface = "wlan0";
   hostname = "example";
+  ip = "10.0.0.4";
+  ipGateway = "10.0.0.1";
+  dns = ["1.1.1.3" "1.0.0.3"];
+  tcpPort = [22 53 80 443];
+  udpPort = [53];
 in {
   
   # Disable default imports
@@ -71,14 +76,14 @@ in {
     # Firewall settings
     firewall = {
       enable = true;
-      allowedTCPPorts = [22 53 80 443];
-      allowedUDPPorts = [53];
+      allowedTCPPorts = tcpPort;
+      allowedUDPPorts = udpPort;
     };
 
     # Set hostname and extra hosts
     hostName = hostname;
     extraHosts = ''
-      192.168.10.3 ${hostname}.local
+      ${ip} ${hostname}.local
     '';
 
     # Wireless network settings
@@ -96,15 +101,15 @@ in {
       end0.useDHCP = false;
       end0.ipv4.addresses = [
         {
-          address = "192.168.10.3";
+          address = ip;
           prefixLength = 24;
         }
       ];
     };
 
     # Default gateway and nameservers
-    defaultGateway = "192.168.10.1";
-    nameservers = ["1.1.1.3" "1.0.0.3"];
+    defaultGateway = ipGateway;
+    nameservers = dns;
   };
   
   # Set available shells
